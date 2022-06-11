@@ -22,7 +22,7 @@ func NewOrdersStorage (pool *pgxpool.Pool) *OrdersStorage  {
 }
 
 // записал в бд и мапку
-func (storage *OrdersStorage) CreateOrder(order models.Order)  error {
+func (storage *OrdersStorage) CreateOrder(order *models.Order)  error {
 	query := "INSERT INTO orders (order_number, order_data) VALUES ($1, $2) RETURNING id"
 	if err := storage.databasePool.QueryRow(context.Background(), query, order.OrderNumber, order.Data).Scan(&order.Id); err != nil {
 		return fmt.Errorf("error adding order: %w", err)
@@ -59,8 +59,8 @@ func (storage *OrdersStorage) UploadCache(ctx context.Context) error {
 func (storage *OrdersStorage) Order(orderNumber string) ([]byte, error) {
 	val, ok := storage.m.Load(orderNumber)
 	if ok == false {
-		log.Println("данный заказ отсутствует в кеше")
-		return nil, errors.New("заказ не найден")
+		log.Println("данный order отсутствует в кеше")
+		return nil, errors.New("order не найден")
 	}
 	value := val.([]byte)
 	return value, nil

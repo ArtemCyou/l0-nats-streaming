@@ -11,14 +11,19 @@ type OrdersProcessor struct {
 }
 
 func NewUserProcessor(storage *db.OrdersStorage) *OrdersProcessor {
-	processor :=new(OrdersProcessor)
+	processor := new(OrdersProcessor)
 	processor.storage = storage
-	return storage
+	return processor
 }
 
-func (processor *OrdersProcessor) CreateOrder(order models.Order) error  {
-if order.OrderNumber == "" {
-	return errors.New("order number not be empty")
+func (processor *OrdersProcessor) CreateOrder(order *models.Order) error {
+	if order.OrderNumber == "" {
+		return errors.New("order number not be empty")
+	}
+	return processor.storage.CreateOrder(order)
 }
-return processor.storage.CreateOrder(order)
+
+func (processor *OrdersProcessor) FindOrderId(id string) ([]byte, error) {
+	order, err := processor.storage.Order(id)
+	return order, err
 }
