@@ -54,9 +54,8 @@ func (server *Server) Serve() {
 	//routes.Use() //todo дописать мидлвер
 
 	//загрузим кеш из БД
-	err = ordersStorage.UploadCache(context.Background())
-	if err != nil {
-		log.Println(err)
+	if err := ordersStorage.UploadCache(context.Background()); err != nil {
+		log.Printf("Upload Cache: ", err)
 	}
 
 	//стартуем сервер, передаем порт и наш mux
@@ -77,7 +76,7 @@ func (server *Server) Serve() {
 
 	//пишем в postgresql
 	// Subscribe starting with most recently published value
-	if _, err = sNat.Subscribe("orders", ordersHandler.Create, stan.StartWithLastReceived()); err != nil {
+	if _, err = sNat.Subscribe("orders", ordersProcessor.CreateOrder, stan.StartWithLastReceived()); err != nil {
 		return
 	}
 

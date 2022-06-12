@@ -12,17 +12,17 @@ import (
 
 type OrdersStorage struct {
 	databasePool *pgxpool.Pool
-	m  sync.Map
+	m            sync.Map
 }
 
-func NewOrdersStorage (pool *pgxpool.Pool) *OrdersStorage  {
+func NewOrdersStorage(pool *pgxpool.Pool) *OrdersStorage {
 	storage := new(OrdersStorage)
 	storage.databasePool = pool
 	return storage
 }
 
 // записал в бд и мапку
-func (storage *OrdersStorage) CreateOrder(order *models.Order)  error {
+func (storage *OrdersStorage) CreateOrder(order *models.Order) error {
 	query := "INSERT INTO orders (order_number, order_data) VALUES ($1, $2) RETURNING id"
 	if err := storage.databasePool.QueryRow(context.Background(), query, order.OrderNumber, order.Data).Scan(&order.Id); err != nil {
 		return fmt.Errorf("error adding order: %w", err)
@@ -30,6 +30,7 @@ func (storage *OrdersStorage) CreateOrder(order *models.Order)  error {
 
 	storage.m.Store(order.OrderNumber, order.Data)
 
+	log.Println("order adding: success")
 	return nil
 }
 
@@ -51,7 +52,7 @@ func (storage *OrdersStorage) UploadCache(ctx context.Context) error {
 		orders = append(orders, order)
 		storage.m.Store(order.OrderNumber, order.Data)
 	}
-
+	log.Println("upload cache: success")
 	return nil
 }
 

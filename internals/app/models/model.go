@@ -1,7 +1,7 @@
 package models
 
 type Order struct {
-	Id          string `db:"id"`
+	Id          int `db:"id"`
 	OrderNumber string `db:"order_number"`
 	Data        []byte `db:"order_data"`
 }

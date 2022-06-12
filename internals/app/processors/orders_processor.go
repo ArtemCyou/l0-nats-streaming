@@ -1,7 +1,10 @@
 package processors
 
 import (
-	"errors"
+	"encoding/json"
+	//"errors"
+	"github.com/nats-io/stan.go"
+	"log"
 	"wb_l0/internals/app/db"
 	"wb_l0/internals/app/models"
 )
@@ -16,11 +19,31 @@ func NewUserProcessor(storage *db.OrdersStorage) *OrdersProcessor {
 	return processor
 }
 
-func (processor *OrdersProcessor) CreateOrder(order *models.Order) error {
-	if order.OrderNumber == "" {
-		return errors.New("order number not be empty")
+type natsMessage struct {
+	OrderNumber string `json:"order_uid"`
+}
+
+func (processor *OrdersProcessor) CreateOrder(m *stan.Msg)  {
+	//if order.OrderNumber == "" {
+	//	return errors.New("order number not be empty")
+	//}
+
+	var msg natsMessage
+	if err := json.Unmarshal(m.Data, &msg); err != nil {
+		log.Println(err)
+		return
 	}
-	return processor.storage.CreateOrder(order)
+
+	// пишем в модель данные от натс
+	order := &models.Order{}
+	order.Data = m.Data
+	order.OrderNumber = msg.OrderNumber
+	// пишем в постгрес и айди в мапу
+
+	err := processor.storage.CreateOrder(order)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func (processor *OrdersProcessor) FindOrderId(id string) ([]byte, error) {
