@@ -20,7 +20,7 @@ docker-compose up -d
 CREATE TABLE orders
 (
     id BIGSERIAL PRIMARY KEY,
-    order_num VARCHAR(255) NOT NULL UNIQUE,
+    order_number VARCHAR(255) NOT NULL UNIQUE,
     order_data jsonb NOT NULL
 );
 ```
