@@ -27,9 +27,5 @@ services:
       STAN_MONITOR_URL: "http://nats:8222"
       STAN_CLUSTER: test-cluster
 
-
-
-
-
 volumes:
   postgres:
